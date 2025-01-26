@@ -1,55 +1,51 @@
 #include <MPU6050.h>
+#include <rtos.h>
 #include <header.h>
 #include <fstream>
+#include <condition_variable>
+
+using namespace std;
 
 MPU6050 mpu(PIN_SDA, PIN_SCL);
+KalmanFilter kf(GYRO_BIAS, GYRO_MEASURE);
+Timer gyro_time;
 
 int main()
 {
-    Timer time;
-    Ticker gyro_update;
-    double gyro_z_axis_accumulated, gyro_move;
-
     if(!mpu.initialize()) {
         return 1;
     }
 
-    time.start();
+    Ticker gyro_update;
+    double gyro_move, gyro_z_axis = 0;
+    Thread gyro_measure_csv;
+    Mutex gyro_write;
+    ofstream output_file("output.txt");
+    string line, cell;
 
-    gyro_update.attach_us([&]() -> double { 
-        double gyro[3];
-            
-        gyro_z_axis_accumulated = 0;
-        gyro_move = 0;                                 
-            
-        for(int i = 0; i < GYRO_N_SAMPLE; i++) {
-            //mpu.readGyro(gyro); 
-            read_csv(&gyro[2]);                         
-            gyro_z_axis_accumulated += gyro[2] * PI / 180.0; 
-        }
+    if(!output_file) {
+        return 1;
+    }
 
-        gyro_z_axis_accumulated /= GYRO_N_SAMPLE;
+    gyro_time.start();
 
-        if(gyro_z_axis_accumulated < GYRO_RAD_TOLERANCE) {
-            gyro_z_axis_accumulated = 0;
-        }
+    /*gyro_update.attach([&]() -> double { 
+        double gyro[3];                              
+        mpu.readGyro(gyro);                       
+        gyro_z_axis = gyro[2] * PI / 180.0;
+    }, GYRO_UPDATE_PERIOD);*/
 
-        double dt = time.elapsed_time().count() / 1000000.0;
+    gyro_measure_csv.start(callback(read_csv, &gyro_z_axis));
 
-        gyro_move += gyro_z_axis_accumulated * dt;
+    while(1) {
+        gyro_move = kf.update(gyro_z_axis, gyro_time);
 
-        std::ofstream file("output.txt");
+        output_file << gyro_move << "\n";
 
-        if(!file.is_open()) {
-            return 1;
-        }
+        gyro_time.reset();
+    }
 
-        file << gyro_move << std::endl;
-
-        file.close();
-
-        time.reset();
-    }, GYRO_UPDATE_PERIOD);
+    output_file.close();
 
     return 0;
 }

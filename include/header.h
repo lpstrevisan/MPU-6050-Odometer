@@ -8,21 +8,20 @@
 #define PIN_SDA PF_0
 #define PIN_SCL PF_1
 
-#define GYRO_UPDATE_PERIOD 5
-#define GYRO_N_SAMPLE 3
-#define GYRO_RAD_TOLERANCE 0.03
-
-void read_csv(double *gyro);
+#define GYRO_UPDATE_PERIOD 0.005
+#define GYRO_BIAS 0.003
+#define GYRO_MEASURE 0.03
 
 class KalmanFilter {
     public:
-        KalmanFilter(double, double, Timer);
+        KalmanFilter(double, double);
         double update(double, Timer);
 
     private:
         double m_Q_bias, m_R_measure, m_P[2][2]; 
         double m_K_value, m_K_bias;
-        double m_last_time;
 };
+
+void read_csv(double *);
 
 #endif

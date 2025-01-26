@@ -1,29 +1,23 @@
-#include <iostream>
+#include <header.h>
 #include <fstream>
 #include <sstream>
-#include <string>
-#include <mbed.h>
 
 using namespace std;
 
 void read_csv(double *gyro) {
-    ifstream file("../include/filtered_robot_log.csv");
+    ifstream input_file("filtered_robot_log.csv");
+    string line, cell;
 
-    if (!file.is_open()) {
-        printf("file don't opened");
-    }
+    getline(input_file, line);
 
-    std::string row;
+    while(getline(input_file, line)) {
+        stringstream line_stream(line);
 
-    while(std::getline(file, row)) {
-        std::stringstream ss(row);
-        std::string before_comma;
-        
-        if(std::getline(ss, before_comma, ',')) {
-            *gyro = std::stod(before_comma);
+        if(getline(line_stream, cell, ',')) {
+            *gyro = stod(cell) * PI / 180.0;
             ThisThread::sleep_for(5ms);
         }
     }
-        
-    file.close();
+
+    input_file.close();
 }
