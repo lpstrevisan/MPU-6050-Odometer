@@ -8,7 +8,7 @@ Ticker gyroTicker;
 int main() {
     mpu.initialize();
     calibrate_gyro();
-    
+
     gyroTicker.attach(&flag_gyro, sample_time);
     
     while (true) {
@@ -38,7 +38,7 @@ void calibrate_gyro() {
         sum += gyro_raw[2];
     }
 
-    gyro_offset_z = sum / CALIBRATE_SAMPLES;
+    gyro_offset_z = (sum / CALIBRATE_SAMPLES) * DEG_TO_RAD;
 }
 
 void flag_gyro() {
