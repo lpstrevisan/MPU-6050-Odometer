@@ -1,12 +1,15 @@
 #include <header.h>
 
+const auto sample_time = 5ms;
+
 MPU6050 mpu(PIN_SDA, PIN_SCL); // Assuming I2C is connected to PF_0 (SDA) and PF_1 (SCL)
 Ticker gyroTicker;
 
 int main() {
     mpu.initialize();
     calibrate_gyro();
-    gyroTicker.attach(&flag_gyro, SAMPLE_TIME);
+    
+    gyroTicker.attach(&flag_gyro, sample_time);
     
     while (true) {
         if(is_ready) {
@@ -14,11 +17,12 @@ int main() {
             read_gyro();
             filter_gyro();
         }
-        // Integrate to get angular position (simple Euler integration)
-        angle = angular_velocity * SAMPLE_TIME;
 
+        // Integrate to get angular position (simple Euler integration)
+        angle = angular_velocity * (sample_time.count() / 1000.0) ;
         printf("Angular Position (rad): %f\n", angle);
-        ThisThread::sleep_for(4ms);
+
+        ThisThread::sleep_for(sample_time - 1ms);
     }
 
     return 0;
@@ -45,7 +49,6 @@ void read_gyro() {
     double gyro_data[3] = {0};
     mpu.readGyro(gyro_data);
     
-    // Convert gyro data from degrees/sec to radians/sec
     gyro_z_rad = (gyro_data[2] - gyro_offset_z) * DEG_TO_RAD;
 }
 

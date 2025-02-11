@@ -2,12 +2,12 @@
 #define HEADER_H
 
 #include <MPU6050.h>
+#include <chrono>
 
 #define PIN_SDA PF_0
 #define PIN_SCL PF_1
 
 #define DEG_TO_RAD 0.0174533   // Conversion factor from degrees to radians
-#define SAMPLE_TIME 0.005      // 5ms sample time
 #define ALPHA 0.8              // Low-pass filter coefficient
 #define CALIBRATE_SAMPLES 100
 
