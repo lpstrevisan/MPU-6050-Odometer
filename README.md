@@ -1,3 +1,3 @@
 ## Validation
 
-![image](https://github.com/lpstrevisan/r/result)
+![image](https://github.com/lpstrevisan/r/blob/master/result.jpg)
