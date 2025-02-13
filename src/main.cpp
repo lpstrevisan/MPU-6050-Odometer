@@ -1,6 +1,6 @@
 #include <header.h>
 
-const auto sample_time = 5ms;
+const auto sample_time = 5ms; // define frenquency (1 / 200Hz = 0,005s = 5ms)
 
 MPU6050 mpu(PIN_SDA, PIN_SCL); // Assuming I2C is connected to PF_0 (SDA) and PF_1 (SCL)
 
@@ -41,7 +41,7 @@ void read_gyro() {
     double gyro_data[3];
     mpu.readGyro(gyro_data);
     
-    gyro_z_rad = (gyro_data[2] - gyro_offset_z) * (PI / 180.0);
+    gyro_z_rad = (gyro_data[2] - gyro_offset_z) * (PI / 180.0); // degrees per second to radians per second 
 }
 
 void filter_gyro() {
