@@ -12,3 +12,7 @@ This project is a simple odometer that takes z-axis values ​​from the MPU-60
     * I2C communication
     * set to 2000º/s
     * set to 200Hz
+
+## Result
+Below is the output of my code vs the odometer log implemented on a robot for the same input
+![Result](result.jpg)
